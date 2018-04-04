@@ -1,7 +1,7 @@
 # simpleci
 Jenkins based CI tool with plugins and configuration
 
-## Pre-requisites:
+### Pre-requisites
 Docker and Docker-compose should be installed on your host machine.
 
 ### A compose of following Docker containers:
@@ -36,9 +36,3 @@ Access
 ```shell
   http://<docker IP>:8888/
 ```
-
-Host Machine Should have docker:
-
-Update below line in your DOCKER configuration file, This is one time activity. 
-DOCKER_OPTS="-H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock"
-docker slave plugin reference - https://wiki.jenkins.io/display/JENKINS/Docker+Plugin 
