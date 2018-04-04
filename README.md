@@ -12,6 +12,8 @@ Docker and Docker-compose should be installed on your host machine.
 
 ### Hierarchy
 
+docker-compose.yml: compose file to run the services
+
 Dockerfile: Dockerfile used to build image
 
 plugins.txt: jenkins plugins installed to the docker image
