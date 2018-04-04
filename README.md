@@ -4,6 +4,12 @@ Jenkins based CI tool with plugins and configuration
 ## Pre-requisites:
 Docker and Docker-compose should be installed on your host machine.
 
+### A compose of following Docker containers:
+
+* Jenkins
+* Nexus
+* SonarQube
+
 ### Hierarchy
 
 Dockerfile: Dockerfile used to build image
