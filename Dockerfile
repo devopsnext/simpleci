@@ -1,6 +1,6 @@
 FROM jenkins/jenkins:lts
 
-MAINTAINER YANTRASHALA
+MAINTAINER DEVOPSNEXT
 
 # define env variables
 ENV JENKINS_REF="/usr/share/jenkins/ref/init.groovy.d/"
