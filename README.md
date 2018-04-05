@@ -25,13 +25,13 @@ simpleci.conf: sample configuration file that stores the url, username and passo
 Build image:
 
 ```shell
-docker build -t yantrashala/simpleci:1.0 .
+docker build -t devopsnext/simpleci:1.0 .
 ```
 
 Run image:
 
 ```shell
-docker run -v ~/opt:/opt -p 8888:8080 -p 50000:50000 yantrashala/simpleci:1.0
+docker run -v ~/opt:/opt -p 8888:8080 -p 50000:50000 devopsnext/simpleci:1.0
 ```
 
 Access 
