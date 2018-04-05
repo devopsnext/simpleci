@@ -23,19 +23,34 @@ import java.util.Base64;
 	
 	def descript
 	
-	// Jenkins Credentials
-	properties.credentials.each() { configName, serverConfig ->
+	// // This is for adding credentials to Jenkins
+	// properties.credentials.each() { configName, serverConfig ->
 	
-		// Decode password using base64
-		byte[] valueDecoded =  Base64.getDecoder().decode(serverConfig.password);
-		Credentials creds = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
-													  serverConfig.credentialsId,
-													  serverConfig.description,
-													  serverConfig.username,new String(valueDecoded)
-													  /*new File(serverConfig.path).text.trim()*/)
-		descript = serverConfig.credentialsId;
-		SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), creds)
-	}
+		// // Decode password using base64
+	// 	byte[] valueDecoded =  Base64.getDecoder().decode(serverConfig.password);
+	//	Credentials creds = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
+	//												  serverConfig.credentialsId,
+	//												  serverConfig.description,
+	//												  serverConfig.username,new String(valueDecoded)
+	//												  /*new File(serverConfig.path).text.trim()*/)
+	//	descript = serverConfig.credentialsId;
+	//	SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), creds)
+	// }
+	
+	//  Below is the template for the same
+	// credentials {
+   // artifactory {
+	// 	type 			= "password"
+	// 	username		= "nbansal16"
+	//	credentialsId 	= "artifactory-publisher"
+	//	description 	= "Jenkins-User"
+	//	path 			= "/var/jenkins_home/.ssh/.password"
+	//	password 		= ""
+	//}	
+// }
+
+	
+	
 
 	if(shared_library_url!=null && shared_library_version!=null && shared_library_name!=null ){
 		

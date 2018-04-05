@@ -26,15 +26,17 @@ Build image:
 
 ```shell
 docker build -t devopsnext/simpleci:1.0 .
+docker-compose build
 ```
 
 Run image:
 
 ```shell
-docker run -v ~/opt:/opt -p 8888:8080 -p 50000:50000 devopsnext/simpleci:1.0
+docker run -v ~/opt:/opt -p 8080:8080 -p 50000:50000 devopsnext/simpleci:1.0
+docker-compose up -d 
 ```
 
 Access 
 ```shell
-  http://<docker IP>:8888/
+  http://<docker IP>:8080/
 ```

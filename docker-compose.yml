@@ -2,16 +2,10 @@ version: '2'
 
 services:
   jenkins:
-    image: devopsnext/simpleci
+    image: devopsnext/simpleci:0.1
     ports:
       - '8080:8080'
       - '50000:50000'
     volumes:
-      - /var/jenkins_volume:/opt/jenkins
-  
-  template-creation:
-    image: devopsnext/simpleci-template-creation:0.1
-    ports:
-      - '8000:8000'
-    volumes:
-      - /var/jenkins_volume:/opt/jenkins
+      - /var/jenkins_volume:/var/jenkins_home
+    build: .
