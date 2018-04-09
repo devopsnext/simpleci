@@ -20,6 +20,12 @@ import java.util.Base64;
 	//Get instance of Jenkins
 	jenkins = Jenkins.instance
 	def parent = Jenkins.getInstance()
+	
+	// Get the out variable
+	def config = new HashMap()
+	def bindings = getBinding()
+	config.putAll(bindings.getVariables())
+	def out = config['out']
 
 	// configuring the bitbucket project using environment variable
 	if (bitbucker_url!=null && bitbucket_username!=null && bitbucket_pass!=null) {
@@ -58,39 +64,55 @@ import java.util.Base64;
 	else{
 	
 		def home_dir = System.getenv("JENKINS_CONF")
-		def properties = new ConfigSlurper().parse(new File("$home_dir/simpleci.conf").toURI().toURL())
 		
-		properties.bitbucketConfig.each() { configName, serverConfig ->
+		def file 					= new File("$home_dir/simpleci.conf")
+		int i=1;
+		// check if the file exists at the location. if not wait for it for 2 minutes. Repeat this process for 5 times.	
+		while(!file.exists() && i<6){
+			out.println ("I am a test info log")
+			i++;
+			Thread.sleep(120000)
+		}
+		//if the file not read even after 10 minutes, print the error message else read the file and continue.
+		if(i==6){
+			out.println ("Config file not present at the location. Please generate the file and try again later")
+			System.exit(0);	
+		}else{
+		
+			def properties = new ConfigSlurper().parse(new File("$home_dir/simpleci.conf").toURI().toURL())
+			
+			properties.bitbucketConfig.each() { configName, serverConfig ->
+							
+				//Jenkins Credentials
+		
+				String id = java.util.UUID.randomUUID().toString()
+				// Decode password using base64
+				byte[] valueDecoded = Base64.getDecoder().decode(serverConfig.password);
+				Credentials c = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,id, serverConfig.username, serverConfig.username, new String(valueDecoded))
+				SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
+				
+				//Add bitbucket end point URLS to server list
+				BitbucketEndpointConfiguration
+								.get().addEndpoint(new BitbucketServerEndpoint("bitbucket", serverConfig.serverUrl, false, null));
 						
-			//Jenkins Credentials
-	
-			String id = java.util.UUID.randomUUID().toString()
-			// Decode password using base64
-			byte[] valueDecoded = Base64.getDecoder().decode(serverConfig.password);
-			Credentials c = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,id, serverConfig.username, serverConfig.username, new String(valueDecoded))
-			SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
-			
-			//Add bitbucket end point URLS to server list
-			BitbucketEndpointConfiguration
-							.get().addEndpoint(new BitbucketServerEndpoint("bitbucket", serverConfig.serverUrl, false, null));
-					
-			// Create the new item of Bitbucket Team/ Project Type 
-			OrganizationFolder teamFolder = parent.createProject(OrganizationFolder.class, serverConfig.project);
-			//Add Owner information
-			BitbucketSCMNavigator navigator = new BitbucketSCMNavigator(serverConfig.project);
+				// Create the new item of Bitbucket Team/ Project Type 
+				OrganizationFolder teamFolder = parent.createProject(OrganizationFolder.class, serverConfig.project);
+				//Add Owner information
+				BitbucketSCMNavigator navigator = new BitbucketSCMNavigator(serverConfig.project);
 
-			// preselect the bitbucket server url and start scan here
-			navigator.setBitbucketServerUrl(serverConfig.serverUrl);
-			teamFolder.getNavigators().add(navigator);
-			
-			//Add only Discovery behaviour to navigator.
-			List<SCMTrait<? extends SCMTrait<?>>> traitsNew = new ArrayList<>();
-			traitsNew.add(new BranchDiscoveryTrait(true, true));
-			navigator.setTraits(traitsNew);
-			navigator.setCredentialsId(id)
-			teamFolder.scheduleBuild2(0).getFuture().get();
-			teamFolder.getComputation().writeWholeLogTo(System.out)
-			
-			
-		}	
+				// preselect the bitbucket server url and start scan here
+				navigator.setBitbucketServerUrl(serverConfig.serverUrl);
+				teamFolder.getNavigators().add(navigator);
+				
+				//Add only Discovery behaviour to navigator.
+				List<SCMTrait<? extends SCMTrait<?>>> traitsNew = new ArrayList<>();
+				traitsNew.add(new BranchDiscoveryTrait(true, true));
+				navigator.setTraits(traitsNew);
+				navigator.setCredentialsId(id)
+				teamFolder.scheduleBuild2(0).getFuture().get();
+				teamFolder.getComputation().writeWholeLogTo(System.out)
+				
+				
+			}
+		}
 	}

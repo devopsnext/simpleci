@@ -7,8 +7,6 @@ Docker and Docker-compose should be installed on your host machine.
 ### A compose of following Docker containers:
 
 * Jenkins
-* Nexus
-* SonarQube
 
 ### Hierarchy
 
@@ -25,14 +23,14 @@ simpleci.conf: sample configuration file that stores the url, username and passo
 Build image:
 
 ```shell
-docker build -t devopsnext/simpleci:1.0 .
+docker build -t devopsnext/simpleci:0.1 .
 docker-compose build
 ```
 
 Run image:
 
 ```shell
-docker run -v ~/opt:/opt -p 8080:8080 -p 50000:50000 devopsnext/simpleci:1.0
+docker run -v ~/opt:/opt -p 8080:8080 -p 50000:50000 devopsnext/simpleci:0.1
 docker-compose up -d 
 ```
 
