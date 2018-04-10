@@ -30,14 +30,14 @@ import java.util.Base64;
 	
 	// check if the file exists at the location. if not wait for it for 2 minutes. Repear this process for 5 times.	
 	while(!file.exists() && i<6){
-		out.println ("I am a test info log")
+		out.println ("Waiting for SimpleCI.conf file : Iteration " +i)
 		i++;
 		Thread.sleep(120000)
 	}
 	//if the file not read even after 10 minutes, print the error message else read the file and continue.
 	if(i==6){
-		out.println ("Config file not present at the location. Please generate the file and try again later")	
-		System.exit(0);	
+		out.println ("Config file not present at the location " + home_dir+". Please generate the file and try again later")	
+		return;	
 	}else{
 	
 		def properties 				= new ConfigSlurper().parse(new File("$home_dir/simpleci.conf").toURI().toURL())
