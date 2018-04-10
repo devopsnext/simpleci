@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:lts
+FROM jenkins/jenkins:lts-alpine
 
 MAINTAINER DEVOPSNEXT
 
@@ -21,3 +21,6 @@ RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
 # copy jenkins shared configuration
 COPY init.groovy.d/ $JENKINS_REF
+
+EXPOSE 8080
+EXPOSE 50000

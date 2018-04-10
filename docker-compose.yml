@@ -7,5 +7,5 @@ services:
       - '8080:8080'
       - '50000:50000'
     volumes:
-      - /var/jenkins_volume:/var/jenkins_home
+      - /var/jenkins_volume:/opt/jenkins
     build: .
