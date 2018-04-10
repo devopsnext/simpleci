@@ -19,75 +19,97 @@ import java.util.Base64;
 	def inst 					= Jenkins.getInstance()
 	def desc 					= inst.getDescriptor("org.jenkinsci.plugins.workflow.libs.GlobalLibraries")
 	def home_dir 				= System.getenv("JENKINS_CONF")
-	def properties 				= new ConfigSlurper().parse(new File("$home_dir/simpleci.conf").toURI().toURL())
-	
-	def descript
-	
-	// // This is for adding credentials to Jenkins
-	// properties.credentials.each() { configName, serverConfig ->
-	
-		// // Decode password using base64
-	// 	byte[] valueDecoded =  Base64.getDecoder().decode(serverConfig.password);
-	//	Credentials creds = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
-	//												  serverConfig.credentialsId,
-	//												  serverConfig.description,
-	//												  serverConfig.username,new String(valueDecoded)
-	//												  /*new File(serverConfig.path).text.trim()*/)
-	//	descript = serverConfig.credentialsId;
-	//	SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), creds)
-	// }
-	
-	//  Below is the template for the same
-	// credentials {
-   // artifactory {
-	// 	type 			= "password"
-	// 	username		= "nbansal16"
-	//	credentialsId 	= "artifactory-publisher"
-	//	description 	= "Jenkins-User"
-	//	path 			= "/var/jenkins_home/.ssh/.password"
-	//	password 		= ""
-	//}	
-// }
+	def file 					= new File("$home_dir/simpleci.conf")
 
+	// Get the out variable
+	def config = new HashMap()
+	def bindings = getBinding()
+	config.putAll(bindings.getVariables())
+	def out = config['out']
+	int i=1;
 	
-	
-
-	if(shared_library_url!=null && shared_library_version!=null && shared_library_name!=null ){
-		
-		//This is for Modern SCM as Retrieval Method
-		SCMSourceRetriever retriever = new SCMSourceRetriever(new GitSCMSource(
-			"scmSourceId",
-			shared_library_url,
-			descript,
-			"*",
-			"",
-			false))
-		
-		def name = shared_library_name  
-		LibraryConfiguration libconfig = new LibraryConfiguration(name, retriever)
-		libconfig.setDefaultVersion(shared_library_version)
-		libconfig.setImplicit(true)
-		libconfig.setAllowVersionOverride(false)
-		desc.get().setLibraries([libconfig])
+	// check if the file exists at the location. if not wait for it for 2 minutes. Repear this process for 5 times.	
+	while(!file.exists() && i<6){
+		out.println ("Waiting for SimpleCI.conf file : Iteration " +i)
+		i++;
+		Thread.sleep(120000)
 	}
-	//In absence of env_var, look into property file for configurations
-	else{
+	//if the file not read even after 10 minutes, print the error message else read the file and continue.
+	if(i==6){
+		out.println ("Config file not present at the location " + home_dir+". Please generate the file and try again later")	
+		return;	
+	}else{
 	
-		properties.sharedLibrary.each() { configName, serverConfig ->
-			// This is for Modern SCM as Retrieval Method
+		def properties 				= new ConfigSlurper().parse(new File("$home_dir/simpleci.conf").toURI().toURL())
+		
+		def descript
+		
+		// // This is for adding credentials to Jenkins
+		// properties.credentials.each() { configName, serverConfig ->
+		
+			// // Decode password using base64
+		// 	byte[] valueDecoded =  Base64.getDecoder().decode(serverConfig.password);
+		//	Credentials creds = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
+		//												  serverConfig.credentialsId,
+		//												  serverConfig.description,
+		//												  serverConfig.username,new String(valueDecoded)
+		//												  /*new File(serverConfig.path).text.trim()*/)
+		//	descript = serverConfig.credentialsId;
+		//	SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), creds)
+		// }
+		
+		//  Below is the template for the same
+		// credentials {
+	   // artifactory {
+		// 	type 			= "password"
+		// 	username		= "nbansal16"
+		//	credentialsId 	= "artifactory-publisher"
+		//	description 	= "Jenkins-User"
+		//	path 			= "/var/jenkins_home/.ssh/.password"
+		//	password 		= ""
+		//}	
+	// }
+
+		
+		
+
+		if(shared_library_url!=null && shared_library_version!=null && shared_library_name!=null ){
+			
+			//This is for Modern SCM as Retrieval Method
 			SCMSourceRetriever retriever = new SCMSourceRetriever(new GitSCMSource(
 				"scmSourceId",
-				serverConfig.githubURL,
+				shared_library_url,
 				descript,
 				"*",
 				"",
 				false))
 			
-			def name = serverConfig.libraryName  
+			def name = shared_library_name  
 			LibraryConfiguration libconfig = new LibraryConfiguration(name, retriever)
-			libconfig.setDefaultVersion(serverConfig.version)
+			libconfig.setDefaultVersion(shared_library_version)
 			libconfig.setImplicit(true)
 			libconfig.setAllowVersionOverride(false)
 			desc.get().setLibraries([libconfig])
+		}
+		//In absence of env_var, look into property file for configurations
+		else{
+		
+			properties.sharedLibrary.each() { configName, serverConfig ->
+				// This is for Modern SCM as Retrieval Method
+				SCMSourceRetriever retriever = new SCMSourceRetriever(new GitSCMSource(
+					"scmSourceId",
+					serverConfig.githubURL,
+					descript,
+					"*",
+					"",
+					false))
+				
+				def name = serverConfig.libraryName  
+				LibraryConfiguration libconfig = new LibraryConfiguration(name, retriever)
+				libconfig.setDefaultVersion(serverConfig.version)
+				libconfig.setImplicit(true)
+				libconfig.setAllowVersionOverride(false)
+				desc.get().setLibraries([libconfig])
+			}
 		}
 	}
