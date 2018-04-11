@@ -37,7 +37,7 @@ import java.util.Base64;
 	//if the file not read even after 10 minutes, print the error message else read the file and continue.
 	if(i==6){
 		out.println ("Config file not present at the location " + home_dir+". Please generate the file and try again later")	
-		return;	
+		System.exit();	
 	}else{
 	
 		def properties 				= new ConfigSlurper().parse(new File("$home_dir/simpleci.conf").toURI().toURL())
